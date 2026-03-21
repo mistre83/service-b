@@ -1,0 +1,32 @@
+name: Deploy
+run-name: "Deploy to ${{ inputs.environment }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment (prod is blocked)'
+        required: true
+        default: 'test'
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      image_tag:
+        required: false
+        type: string
+        description: 'Image tag to deploy (if empty, reads latest from SSM)'
+      branch:
+        required: false
+        type: string
+        description: 'Source branch (if empty, reads from SSM)'
+
+jobs:
+  deploy:
+    uses: mistre83/shared-workflows/.github/workflows/deploy.yml@main
+    with:
+      environment: ${{ inputs.environment }}
+      image_tag: ${{ inputs.image_tag }}
+      branch: ${{ inputs.branch }}
+    secrets: inherit

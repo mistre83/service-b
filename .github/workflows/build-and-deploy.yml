@@ -1,0 +1,35 @@
+name: Build and Deploy
+run-name: "Build ${{ inputs.branch }} → Deploy to ${{ inputs.environment }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build and deploy'
+        required: true
+        default: 'main'
+      environment:
+        description: 'Target environment (prod is blocked)'
+        required: true
+        default: 'test'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ inputs.branch }})
+    uses: mistre83/shared-workflows/.github/workflows/build.yml@main
+    with:
+      branch: ${{ inputs.branch }}
+    secrets: inherit
+
+  deploy:
+    name: Deploy to ${{ inputs.environment }}
+    needs: build
+    uses: mistre83/shared-workflows/.github/workflows/deploy.yml@main
+    with:
+      environment: ${{ inputs.environment }}
+      image_tag: ${{ needs.build.outputs.image_tag }}
+      branch: ${{ needs.build.outputs.branch }}
+    secrets: inherit
