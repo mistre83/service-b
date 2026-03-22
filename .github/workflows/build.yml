@@ -3,11 +3,11 @@ name: Build
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'CHANGELOG.md'
+      - 'version.txt'
 
 jobs:
   build:
-    # Skip Release Please commits — they contain no code changes.
-    # deploy-prod.yml will deploy the ECR main tag (set by the last real build).
-    if: "!startsWith(github.event.head_commit.message, 'chore: release')"
     uses: mistre83/shared-workflows/.github/workflows/build.yml@main
     secrets: inherit
